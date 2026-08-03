@@ -23,9 +23,11 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
 
-          # Poora project public_html me jayega. Document Root ko baad me
-          # "public_html/public" set karna hai (chat me bataya gaya hai).
-          server-dir: public_html/
+          # Is FTP account ka landing folder hi public_html hai
+          # (/home/u737100938/domains/toolzynet.in/public_html), isliye
+          # server-dir "./" rakha hai — poora project public_html me jayega.
+          # Document Root ko baad me "public_html/public" set karna hai.
+          server-dir: ./
 
           # In files/folders ko server par NA bheje / NA delete kare:
           exclude:
