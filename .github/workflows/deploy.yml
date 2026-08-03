@@ -5,7 +5,7 @@ on:
   push:
     branches:
       - claude/new-session-dk8693
-  workflow_dispatch: {}   # GitHub par "Run workflow" button se manually bhi chala sakte hain
+  workflow_dispatch:
 
 jobs:
   ftp-deploy:
@@ -22,25 +22,22 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-
-          # Is FTP account ka landing folder hi public_html hai
-          # (/home/u737100938/domains/toolzynet.in/public_html), isliye
-          # server-dir "./" rakha hai — poora project public_html me jayega.
+          protocol: ftp
+          port: 21
+          # FTP account ka landing folder hi public_html hai, isliye "./".
           # Document Root ko baad me "public_html/public" set karna hai.
           server-dir: ./
-
-          # In files/folders ko server par NA bheje / NA delete kare:
-          exclude:
-            - "**/.git*"
-            - "**/.git*/**"
-            - ".github/**"
-            - "**/.env"
-            - ".env"
-            - ".env.example"
-            - ".env.hostinger"
-            - "**/README.md"
-            - "DEPLOY_*.md"
-            - "storage/cache/**"
-            - "storage/logs/**"
-            - "public/uploads/**"
-            - "composer.lock"
+          # In files/folders ko server par NA bheje / NA delete kare
+          # (single text block hona chahiye, list nahi):
+          exclude: |
+            **/.git*
+            **/.git*/**
+            .github/**
+            **/.env
+            .env.example
+            .env.hostinger
+            **/*.md
+            storage/cache/**
+            storage/logs/**
+            public/uploads/**
+            composer.lock
