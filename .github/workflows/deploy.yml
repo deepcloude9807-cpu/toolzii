@@ -22,8 +22,10 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
+          # Hostinger sirf secure FTP (FTPS) allow karta hai, isliye ftps.
+          protocol: ftps
           port: 21
+          timeout: 60000
           # FTP account ka landing folder hi public_html hai, isliye "./".
           # Document Root ko baad me "public_html/public" set karna hai.
           server-dir: ./
