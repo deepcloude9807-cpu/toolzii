@@ -1,0 +1,44 @@
+name: Deploy to Hostinger (FTP)
+
+# Har baar is branch par push hone par site automatically deploy ho jayegi.
+on:
+  push:
+    branches:
+      - claude/new-session-dk8693
+  workflow_dispatch: {}   # GitHub par "Run workflow" button se manually bhi chala sakte hain
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Upload files to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          # Ye teen values GitHub repo -> Settings -> Secrets and variables
+          # -> Actions me add karni hain (FTP_SERVER, FTP_USERNAME, FTP_PASSWORD).
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+
+          # Poora project public_html me jayega. Document Root ko baad me
+          # "public_html/public" set karna hai (chat me bataya gaya hai).
+          server-dir: public_html/
+
+          # In files/folders ko server par NA bheje / NA delete kare:
+          exclude:
+            - "**/.git*"
+            - "**/.git*/**"
+            - ".github/**"
+            - "**/.env"
+            - ".env"
+            - ".env.example"
+            - ".env.hostinger"
+            - "**/README.md"
+            - "DEPLOY_*.md"
+            - "storage/cache/**"
+            - "storage/logs/**"
+            - "public/uploads/**"
+            - "composer.lock"
