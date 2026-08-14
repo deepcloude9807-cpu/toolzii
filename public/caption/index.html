@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Caption Studio — Reels/Shorts Auto Captions</title>
+<meta name="description" content="Upload a video, auto-transcribe the voice, and burn animated Reels/Shorts-style word-by-word captions. Customize font, size, color, position, animation and export.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Poppins:wght@600;800&family=Montserrat:wght@700;900&family=Bebas+Neue&family=Anton&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🎬 <span>Caption Studio</span></div>
+  <div class="tag">Reels / Shorts style word-by-word captions</div>
+</header>
+
+<main class="wrap">
+  <!-- LEFT: preview -->
+  <section class="stage">
+    <div id="dropzone" class="dropzone">
+      <div class="dz-inner">
+        <div class="dz-icon">⬆️</div>
+        <h2>Drop a video here or click to upload</h2>
+        <p>MP4 / WebM / MOV — works fully in your browser</p>
+        <input type="file" id="fileInput" accept="video/*" hidden>
+      </div>
+    </div>
+
+    <div id="player" class="player hidden">
+      <div class="canvas-holder">
+        <video id="video" playsinline muted></video>
+        <canvas id="preview"></canvas>
+      </div>
+      <div class="transport">
+        <button id="playBtn" class="icon-btn" title="Play/Pause">▶</button>
+        <input type="range" id="seek" min="0" max="1000" value="0" class="seek">
+        <span id="time" class="time">0:00 / 0:00</span>
+        <button id="muteBtn" class="icon-btn" title="Mute/Unmute">🔇</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT: controls -->
+  <aside class="panel">
+    <div class="tabs">
+      <button class="tab active" data-tab="text">1 · Transcript</button>
+      <button class="tab" data-tab="style">2 · Style</button>
+      <button class="tab" data-tab="export">3 · Export</button>
+    </div>
+
+    <!-- TRANSCRIPT TAB -->
+    <div class="tabpane active" data-pane="text">
+      <div class="field">
+        <label>Auto-transcribe (AI · Whisper)</label>
+        <input type="password" id="apiKey" placeholder="OpenAI API key (optional, stays in your browser)">
+        <button id="whisperBtn" class="btn btn-primary full">✨ Auto-transcribe with AI</button>
+        <p class="hint">Uses Whisper for accurate word-level timing (Hindi + English). Nothing is sent anywhere except OpenAI.</p>
+      </div>
+
+      <div class="divider"><span>or paste it yourself</span></div>
+
+      <div class="field">
+        <label>Paste transcript</label>
+        <textarea id="transcript" rows="5" placeholder="Digital marketing se aap apne business ko online grow kar sakte hain."></textarea>
+        <button id="autoTimeBtn" class="btn full">⏱ Generate word timings</button>
+        <p class="hint">Auto-spreads words across the video length. Fine-tune any word below.</p>
+      </div>
+
+      <div class="field">
+        <label>Words <span id="wordCount" class="muted">(0)</span></label>
+        <div id="wordList" class="word-list"></div>
+      </div>
+    </div>
+
+    <!-- STYLE TAB -->
+    <div class="tabpane" data-pane="style">
+      <div class="field">
+        <label>Preset</label>
+        <div class="preset-row" id="presets"></div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Font</label>
+          <select id="fontFamily">
+            <option value="Anton">Anton</option>
+            <option value="'Bebas Neue'">Bebas Neue</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Poppins">Poppins</option>
+            <option value="Inter">Inter</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Animation</label>
+          <select id="animation">
+            <option value="pop">Pop (active word)</option>
+            <option value="karaoke">Karaoke fill</option>
+            <option value="reveal">Word-by-word reveal</option>
+            <option value="fade">Fade in</option>
+            <option value="slide">Slide up</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Font size <span id="fsVal" class="muted"></span></label>
+          <input type="range" id="fontSize" min="3" max="14" step="0.5" value="7">
+        </div>
+        <div class="field">
+          <label>Words per group <span id="wpgVal" class="muted"></span></label>
+          <input type="range" id="wordsPerGroup" min="1" max="6" step="1" value="3">
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Text color</label><input type="color" id="colorPrimary" value="#ffffff"></div>
+        <div class="field"><label>Active/Highlight</label><input type="color" id="colorHighlight" value="#ffe600"></div>
+      </div>
+      <div class="grid2">
+        <div class="field"><label>Emphasis color</label><input type="color" id="colorEmphasis" value="#00e5ff"></div>
+        <div class="field"><label>Outline</label><input type="color" id="strokeColor" value="#000000"></div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Outline width <span id="swVal" class="muted"></span></label>
+          <input type="range" id="strokeWidth" min="0" max="18" step="1" value="8">
+        </div>
+        <div class="field">
+          <label>Position</label>
+          <select id="position">
+            <option value="bottom">Bottom</option>
+            <option value="center" selected>Center</option>
+            <option value="top">Top</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid2">
+        <label class="check"><input type="checkbox" id="uppercase" checked> UPPERCASE</label>
+        <label class="check"><input type="checkbox" id="bgEnabled"> Highlight box</label>
+      </div>
+      <p class="hint">Tip: mark important words as <b>emphasis</b> in the Transcript tab to make them pop like short-form videos.</p>
+    </div>
+
+    <!-- EXPORT TAB -->
+    <div class="tabpane" data-pane="export">
+      <div class="field">
+        <label>Export quality</label>
+        <select id="quality">
+          <option value="1">Original resolution</option>
+          <option value="720">Cap at 720p</option>
+          <option value="1080" selected>Cap at 1080p</option>
+        </select>
+        <p class="hint">Export records the video in real time and burns captions in. Keep this tab open until it finishes.</p>
+      </div>
+      <button id="exportBtn" class="btn btn-primary full">⬇️ Export video with captions</button>
+      <div id="exportStatus" class="export-status hidden">
+        <div class="bar"><div id="exportBar"></div></div>
+        <span id="exportMsg">Recording…</span>
+      </div>
+      <a id="downloadLink" class="btn full hidden" download="captioned.webm">Save video</a>
+    </div>
+  </aside>
+</main>
+
+<div id="toast" class="toast hidden"></div>
+<script src="app.js"></script>
+</body>
+</html>
